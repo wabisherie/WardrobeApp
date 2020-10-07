@@ -5,8 +5,15 @@ import tkinter as tk
 from PIL import Image, ImageTk
 from playsound import playsound
 
-# change any of these constants to style and make it your own!
-WINDOW_TITLE = 'Wardrobe App'
+""" 
+Hi there! This is my first ever python app recreation.
+I have added a few components to the WardrobeApp - Face and Shoes
+However, this caused a couple of issues when creating the outfit since I did not assign buttons to the face and shoes.
+If you do do this, do share with me how to do it, without making the app too 'buttony' :-D
+Totally enjoyed this project.
+PS. For non-kiswahili speakers, mavazi leo translates to today's clad.
+"""
+WINDOW_TITLE = 'MavazileoApp'
 WINDOW_WIDTH = 220
 WINDOW_HEIGHT = 500
 IMG_HEIGHT = 200
@@ -17,26 +24,37 @@ SOUND_EFFECT_FILE_PATH = 'assets/yes-2.wav'
 # dynamically open folders and make a list, while ignoring any hidden files that start with "."
 # just add any image file into these folders and they will magically appear in your wardrobe!
 # for fun, try to expand this wardrobe to support shoes!
+ALL_FACE = [str("face/") + file for file in os.listdir("face/") if not file.startswith('.')]
 ALL_TOPS = [str("tops/") + file for file in os.listdir("tops/") if not file.startswith('.')]
 ALL_BOTTOMS = [str("bottoms/") + file for file in os.listdir("bottoms/") if not file.startswith('.')]
+ALL_SHOES = [str("shoes/") + file for file in os.listdir("shoes/") if not file.startswith('.')]
 
-
-class WardrobeApp:
+class MavazileoApp:
 
     def __init__(self, root):
         self.root = root
 
         # collecting all the clothes
+        self.face_images = ALL_FACE
         self.top_images = ALL_TOPS
         self.bottom_images = ALL_BOTTOMS
+        self.shoe_images = ALL_SHOES
 
-        # first pictures for top and bottom
+        # first pictures for face, top, bottom and shoes
+        self.face_image_path = self.face_images[0]
         self.tops_image_path = self.top_images[0]
         self.bottom_image_path = self.bottom_images[0]
+        self.shoe_image_path = self.shoe_images[0]
 
-        # creating 2 frames
+        # creating 4 frames
+        self.face_frame = tk.Frame(self.root, bg=BEIGE_COLOR_HEX)
         self.tops_frame = tk.Frame(self.root, bg=BEIGE_COLOR_HEX)
         self.bottoms_frame = tk.Frame(self.root, bg=BEIGE_COLOR_HEX)
+        self.shoes_frame = tk.Frame(self.root, bg=BEIGE_COLOR_HEX)
+
+        #adding face
+        self.face_image_label = self.create_photo(self.face_image_path, self.face_frame)
+        self.face_image_label.pack(side=tk.TOP)
 
         # adding top
         self.top_image_label = self.create_photo(self.tops_image_path, self.tops_frame)
@@ -45,6 +63,10 @@ class WardrobeApp:
         # adding bottom
         self.bottom_image_label = self.create_photo(self.bottom_image_path, self.bottoms_frame)
         self.bottom_image_label.pack(side=tk.TOP)
+
+        #adding shoes
+        self.shoe_image_label = self.create_photo(self.shoe_image_path, self.shoes_frame)
+        self.shoe_image_label.pack(side=tk.TOP)
 
         self.create_background()
 
@@ -57,8 +79,10 @@ class WardrobeApp:
         self.create_buttons()
 
         # add the initial clothes onto the screen
+        self.face_frame.pack(fill=tk.BOTH, expand=tk.YES)
         self.tops_frame.pack(fill=tk.BOTH, expand=tk.YES)
         self.bottoms_frame.pack(fill=tk.BOTH, expand=tk.YES)
+        self.shoes_frame.pack(fill=tk.BOTH, expand=tk.YES)
 
     def create_buttons(self):
         top_prev_button = tk.Button(self.tops_frame, text="Prev", command=self.get_prev_top)
@@ -122,8 +146,17 @@ class WardrobeApp:
             image_label = self.bottom_image_label
             self.bottom_image_path = next_image
 
+            image_label = self.shoe_image_label
+            self.shoe_image_path = next_image
+
+            image_label = self.face_image_label
+            self.face_image_path = next_image
+
         # update the photo
         self.update_photo(next_image, image_label)
+
+    def get_next_face(self):
+        self._get_next_item(self.face_image_path, self.face_images, increment=True)
 
     def get_next_top(self):
         self._get_next_item(self.tops_image_path, self.top_images, increment=True)
@@ -134,6 +167,9 @@ class WardrobeApp:
     def get_prev_bottom(self):
         self._get_next_item(self.bottom_image_path, self.bottom_images, increment=False)
 
+    def get_prev_shoe(self):
+        self._get_next_item(self.shoe_image_path, self.shoe_images, increment=False)
+
     def get_next_bottom(self):
         self._get_next_item(self.bottom_image_path, self.bottom_images, increment=True)
 
@@ -141,17 +177,20 @@ class WardrobeApp:
         # randomly select an outfit
         new_top_index = random.randint(0, len(self.top_images)-1)
         new_bottom_index = random.randint(0, len(self.bottom_images)-1)
+        new_shoe_index = random.randint(0, len(self.shoe_images) - 1)
 
         # add the clothes onto the screen
         self.update_photo(self.top_images[new_top_index], self.top_image_label)
         self.update_photo(self.bottom_images[new_bottom_index], self.bottom_image_label)
+        self.update_photo(self.shoe_images[new_shoe_index], self.shoe_image_label)
 
         # spicy noise
         playsound(SOUND_EFFECT_FILE_PATH)
 
 
+
 if __name__ == '__main__':
     root = tk.Tk()
-    app = WardrobeApp(root)
+    app = MavazileoApp(root)
 
     root.mainloop()
